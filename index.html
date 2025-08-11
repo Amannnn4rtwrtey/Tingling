@@ -9,16 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS Variables for Theming */
         :root {
             --bg-color: #0f0f2d;
             --text-color: #ffffff;
-            --primary-color: #e94560; /* Neon Pink */
-            --secondary-color: #3a8bfd; /* Neon Blue */
+            --primary-color: #e94560;
+            --secondary-color: #3a8bfd;
             --accent-color: #1a1a3a;
             --bubble-sent-bg: #3a8bfd;
             --bubble-received-bg: #2a2a4a;
             --font-family: 'Poppins', sans-serif;
+            --icon-color: #ffffff;
+            --danger-color: #ff3b30;
+            --success-color: #4cd964;
+            --online-color: #2ecc71;
+            --text-muted: #a0a0b0;
+            --tick-color: #a0a0b0;
+            --tick-blue-color: #4fc3f7;
         }
 
         .light-theme {
@@ -29,14 +35,12 @@
             --accent-color: #ffffff;
             --bubble-sent-bg: #3a8bfd;
             --bubble-received-bg: #e4e6eb;
+            --icon-color: #1c1e21;
+            --text-muted: #65676b;
+            --tick-color: #65676b;
         }
 
-        /* General Styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: var(--font-family);
@@ -47,6 +51,8 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .container {
@@ -55,25 +61,15 @@
             max-width: 450px;
             max-height: 900px;
             background-color: var(--accent-color);
-            border-radius: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            display: none; /* Hidden by default */
+            display: none;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* Views */
-        .view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-        }
-        .view.active {
-            display: flex;
-        }
+        .view { display: none; width: 100%; height: 100%; flex-direction: column; }
+        .view.active { display: flex; }
 
-        /* Auth Screen */
         #auth-container {
             display: flex;
             flex-direction: column;
@@ -92,13 +88,12 @@
             margin-bottom: 40px;
         }
 
-        .auth-form {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .auth-form { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        
+        .input-wrapper { position: relative; width: 100%; }
+        #password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+        #password-toggle .icon { fill: var(--text-color); }
+        
         .auth-input {
             border-radius: 25px;
             border: 2px solid var(--secondary-color);
@@ -109,9 +104,7 @@
             font-family: var(--font-family);
             font-size: 16px;
         }
-        .auth-input::placeholder {
-            color: #ccc;
-        }
+        .auth-input::placeholder { color: #ccc; }
 
         .auth-button {
             border-radius: 50px;
@@ -124,370 +117,178 @@
             cursor: pointer;
             width: 100%;
             transition: box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .auth-button:hover {
-            box-shadow: 0 0 15px var(--primary-color);
-        }
+        .auth-button:hover { box-shadow: 0 0 15px var(--primary-color); }
         
-        .form-switch-text {
-            color: var(--text-color);
-            font-size: 13px;
-            text-align: center;
-            margin-top: 15px;
-        }
-        .form-switch-link {
-            color: var(--primary-color);
+        .form-switch-text { color: var(--text-color); font-size: 13px; text-align: center; margin-top: 15px; }
+        .form-switch-link { color: rgb(235, 233, 233); 
             text-decoration: underline;
-            cursor: pointer;
-            font-weight: bold;
-        }
+             cursor: pointer;
+              font-weight: bold;
+              background-color: rgba(0, 0, 0, 0.021);
+              width: 80px;
+              height: 40px;
+              border-radius: 20px;
+             }
 
-        .error-message {
-            color: #ff6b6b;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 14px;
-            min-height: 20px;
-        }
+        .error-message { color: #ff6b6b; text-align: center; margin-top: 10px; font-size: 14px; min-height: 20px; }
 
-        /* Main App Layout */
-        #main-app-container {
-             display: flex; /* Starts as flex */
-        }
+        #main-app-container { display: flex; }
 
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 10px 15px;
             background-color: var(--bg-color);
-            border-bottom: 1px solid var(--accent-color);
+            flex-shrink: 0;
         }
         
-        .top-nav .app-title-small {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-shadow: 0 0 5px var(--primary-color);
-        }
+        .top-nav .app-title-small { font-size: 24px; font-weight: bold; color: var(--primary-color); text-shadow: 0 0 5px var(--primary-color); }
 
         .nav-button {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-family: var(--font-family);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 5px 10px;
+            background: none; border: none; color: var(--text-color);
+            font-family: var(--font-family); font-size: 16px; cursor: pointer;
+            padding: 8px; display: flex; align-items: center; gap: 8px;
         }
         
-        .content-area {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+        .content-area { flex-grow: 1; overflow-y: auto; }
         
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            background-color: var(--bg-color);
-            border-top: 1px solid var(--accent-color);
-        }
+        .bottom-nav { display: flex; justify-content: space-around; padding: 5px 0; background-color: var(--bg-color); flex-shrink: 0;}
         
-        .bottom-nav-button {
-            position: relative;
-        }
+        .bottom-nav-button { position: relative; flex-direction: column; font-size: 12px; }
 
         .badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            display: none; /* Hidden by default */
+            position: absolute; top: -2px; right: 5px;
+            background-color: var(--primary-color); color: white;
+            border-radius: 50%; padding: 2px 6px; font-size: 10px;
+            font-weight: bold; display: none;
         }
 
-
-        /* Modals */
         .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
         .modal-content {
-            background-color: var(--accent-color);
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 350px;
-            text-align: center;
+            background-color: var(--accent-color); padding: 30px;
+            border-radius: 15px; width: 90%; max-width: 350px; text-align: center;
         }
-        .modal-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
+        .modal-title { font-size: 22px; margin-bottom: 20px; }
 
-        /* Chat view */
-        #chat-view {
-           flex-direction: column;
-        }
-        .chat-header {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background-color: var(--bg-color);
-        }
-        .chat-header .user-emoji { font-size: 24px; margin-right: 10px;}
+        .icon { width: 24px; height: 24px; fill: var(--icon-color); }
+        .nav-button .icon { width: 20px; height: 20px; }
+        .bottom-nav-button .icon { width: 28px; height: 28px; margin-bottom: 2px; }
+        .auth-button .icon { fill: white; }
+
+        #chat-view { flex-direction: column; }
+        .chat-header { display: flex; align-items: center; padding: 10px 15px; background-color: var(--bg-color); gap: 10px; flex-shrink: 0;}
+        .chat-header .user-emoji { font-size: 24px; }
+        .chat-header .user-name-wrapper { flex-grow: 1; }
         .chat-header .user-name { font-weight: bold; }
-        .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        .message-bubble {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            margin-bottom: 10px;
-            word-wrap: break-word;
-        }
-        .message-bubble.sent {
-            background-color: var(--bubble-sent-bg);
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        .message-bubble.received {
-            background-color: var(--bubble-received-bg);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid var(--accent-color);
-        }
-        #message-input {
-            flex-grow: 1;
-            border-radius: 20px;
-            border: 1px solid var(--secondary-color);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 10px 15px;
-            margin-right: 10px;
-        }
-        #send-message-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        #typing-indicator { font-size: 12px; color: var(--online-color); height: 14px; }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+        .message-wrapper { display: flex; flex-direction: column; }
+        .message-bubble { max-width: 70%; padding: 10px 15px; border-radius: 18px; word-wrap: break-word; cursor: pointer; }
+        .message-bubble.sent { background-color: var(--bubble-sent-bg); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .message-bubble.received { background-color: var(--bubble-received-bg); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .message-meta { font-size: 10px; color: var(--text-muted); align-self: flex-end; margin-right: 5px; display: flex; align-items: center; gap: 3px; }
+        .message-ticks { width: 16px; height: 16px; }
+        .message-ticks.read { fill: var(--tick-blue-color); }
+        .message-ticks.sent, .message-ticks.delivered { fill: var(--tick-color); }
 
-        /* Call View */
-        #call-view {
-            background-color: #000;
-            color: white;
-            position: relative;
-        }
-        #remote-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #local-video {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 150px;
-            border-radius: 10px;
-            border: 2px solid var(--primary-color);
-            cursor: move;
-        }
-        .call-info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 10px;
-        }
-        .call-info-emoji { font-size: 40px; }
-        .call-info-name { font-size: 20px; font-weight: bold; }
-        .call-controls {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        #end-call-btn {
-            background-color: #ff3b30;
-            color: white;
-            border: none;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-        }
+        .chat-input-area { display: flex; padding: 10px; border-top: 1px solid var(--bg-color); flex-shrink: 0;}
+        #message-input { flex-grow: 1; border-radius: 20px; border: 1px solid var(--secondary-color); background-color: var(--bg-color); color: var(--text-color); padding: 10px 15px; margin-right: 10px; }
+        #send-message-btn { background-color: var(--primary-color); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+        #call-view { background-color: #000; color: white; position: relative; justify-content: center; align-items: center; text-align: center; }
+        #remote-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        #local-video { position: absolute; bottom: 20px; right: 20px; width: 100px; height: 150px; border-radius: 10px; border: 2px solid var(--primary-color); cursor: move; }
         
-        /* List items */
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid var(--bg-color);
-            cursor: pointer;
-        }
-        .list-item:hover {
-            background-color: var(--bg-color);
-        }
-        .list-item-emoji {
-            font-size: 28px;
-            margin-right: 15px;
-        }
-        .list-item-info {
-            flex-grow: 1;
-        }
-        .list-item-name {
-            font-weight: bold;
-        }
-        .list-item-detail {
-            font-size: 13px;
-            color: #aaa;
-        }
-        .list-item-actions button {
-            margin-left: 10px;
-        }
+        #voice-call-ui { display: none; flex-direction: column; align-items: center; }
+        #voice-call-ui .caller-emoji-large { font-size: 80px; }
+        #voice-call-ui .caller-name-large { font-size: 28px; margin-top: 10px; }
+        #voice-call-ui .call-status { font-size: 18px; margin-top: 5px; color: #aaa; }
+        
+        .call-controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); }
+        #end-call-btn { background-color: var(--danger-color); color: white; border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .list-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--bg-color); }
+        .list-item:hover { background-color: var(--bg-color); }
+        .list-item-emoji { font-size: 28px; margin-right: 15px; }
+        .list-item-info { flex-grow: 1; }
+        .list-item-name { font-weight: bold; }
+        .list-item-detail { font-size: 13px; color: var(--text-muted); }
+        .list-item-detail.online { color: var(--online-color); font-weight: bold; }
+        .list-item-actions { display: flex; gap: 5px; }
+        .icon-button { background-color: transparent; border: none; border-radius: 50%; padding: 8px; cursor: pointer; }
+        .icon-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+        .icon-button .icon { fill: var(--secondary-color); }
+
+        #more-menu-btn { position: relative; }
+        #more-menu-dropdown { display: none; position: absolute; top: 40px; right: 0; background-color: var(--bg-color); border-radius: 8px; overflow: hidden; z-index: 10; border: 1px solid var(--accent-color); }
+        #more-menu-dropdown button { width: 100%; text-align: left; padding: 12px 15px; color: var(--text-color); }
+        #more-menu-dropdown button:hover { background-color: var(--accent-color); }
+
     </style>
 </head>
 <body>
+    
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <symbol id="icon-profile" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+        <symbol id="icon-add-friend" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h9.58c-.35-.73-.58-1.55-.58-2.42.01-2.02 1.3-3.73 3-4.4z"/></symbol>
+        <symbol id="icon-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+        <symbol id="icon-notifications" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></symbol>
+        <symbol id="icon-calls" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z"/></symbol>
+        <symbol id="icon-message" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></symbol>
+        <symbol id="icon-video-call" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></symbol>
+        <symbol id="icon-voice-call" viewBox="0 0 24 24"><use xlink:href="#icon-calls"/></symbol>
+        <symbol id="icon-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
+        <symbol id="icon-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+        <symbol id="icon-more" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
+        <symbol id="icon-end-call" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.63.72L12 14.36l4.63-4.63c-1.48-.47-3.03-.73-4.63-.73zm0 2.29L6.12 5.41A15.93 15.93 0 0 1 12 4c4.97 0 9.25 2.24 12 5.62l-3.32 3.32L12 11.29zM2.81 2.81L1.39 4.22 5 7.83c-1.39.99-2.63 2.23-3.66 3.65C4.75 16.76 9.03 19 12 19c1.55 0 3.05-.3 4.45-.85l2.33 2.33 1.41-1.41L2.81 2.81z" transform="rotate(135 12 12)"/></symbol>
+        <symbol id="icon-accept" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+        <symbol id="icon-reject" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></symbol>
+        <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+        <symbol id="icon-theme" viewBox="0 0 24 24"><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></symbol>
+        <symbol id="icon-block" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9.08L9.08 7.5 7.5 9.08 10.92 12 7.5 15.42 9.08 16.9 12 13.08l3.42 3.42 1.58-1.58L13.08 12l3.42-3.42z"/></symbol>
+        <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12c-2.48 0-4.5-2.02-4.5-4.5S9.52 7.5 12 7.5s4.5 2.02 4.5 4.5-2.02 4.5-4.5 4.5zm0-7C10.62 9.5 9.5 10.62 9.5 12s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/></symbol>
+        <symbol id="icon-eye-slash" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75C21.27 7.61 17 4.5 12 4.5c-1.77 0-3.39.53-4.79 1.4l1.57 1.57c.72-.37 1.51-.6 2.32-.6zM2 4.27l3.28 3.28.01.01C3.98 8.85 2.73 10.4 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l2.92 2.92 1.41-1.41L3.41 2.86 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.38 1.12 2.5 2.5 2.5.22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.48 0-4.5-2.02-4.5-4.5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.38-1.12-2.5-2.5-2.5-.06 0-.11.01-.16.02z"/></symbol>
+        <symbol id="icon-tick-single" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+        <symbol id="icon-tick-double" viewBox="0 0 24 24"><path d="M0.41 13.41L6 19l1.41-1.42L1.83 12 0.41 13.41zM20.41 5L9 16.41l-4.5-4.5L6.08 10.5 9 13.41 19 3.41 20.41 5z"/></symbol>
+      </defs>
+    </svg>
 
-    <!-- Main App Structure -->
     <div id="app-wrapper">
-
-        <!-- Authentication View -->
         <div id="auth-container" class="view active">
             <h1 class="app-title">Tingling</h1>
-            
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form">
-                <input type="email" id="login-email" class="auth-input" placeholder="Email" required>
-                <input type="password" id="login-password" class="auth-input" placeholder="Password" required>
-                <button type="submit" class="auth-button">Log In</button>
-                <p id="login-error" class="error-message"></p>
-                <p class="form-switch-text">Don't have an account? <span class="form-switch-link" id="switch-to-signup">Sign up</span></p>
-            </form>
-
-            <!-- Signup Form -->
-            <form id="signup-form" class="auth-form" style="display: none;">
-                <input type="email" id="signup-email" class="auth-input" placeholder="Email" required>
-                <input type="password" id="signup-password" class="auth-input" placeholder="Password" required>
-                <button type="submit" class="auth-button">Sign Up</button>
-                <p id="signup-error" class="error-message"></p>
-                <p class="form-switch-text">Already have an account? <span class="form-switch-link" id="switch-to-login">Log in</span></p>
-            </form>
+            <div id="auth-forms-wrapper"></div>
+            <div id="recaptcha-container"></div>
         </div>
-
-        <!-- Main App (hidden by default) -->
-        <div id="main-app-container" class="container">
-            <!-- This will be populated by JS -->
-        </div>
-
-    </div>
-
-    <!-- Modals -->
-    <div id="profile-setup-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Create Your Profile</h2>
-            <form id="profile-setup-form">
-                <input type="text" id="profile-name" class="auth-input" placeholder="Your Name" required>
-                <br><br>
-                <input type="text" id="profile-emoji" class="auth-input" placeholder="Choose an Emoji (e.g., 😊)" maxlength="2" required>
-                <br><br>
-                <button type="submit" class="auth-button">Save Profile</button>
-            </form>
-        </div>
+        <div id="main-app-container" class="container"></div>
     </div>
     
-    <div id="profile-view-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">My Profile</h2>
-            <p><strong>Name:</strong> <span id="view-profile-name"></span></p>
-            <p><strong>Emoji:</strong> <span id="view-profile-emoji" style="font-size: 24px;"></span></p>
-            <p><strong>Ting ID:</strong> <span id="view-profile-ting-id"></span></p>
-            <br>
-             <button id="theme-toggle-btn" class="auth-button" style="margin-bottom: 10px;">Switch Theme</button>
-            <button id="logout-btn" class="auth-button" style="background-color: #555;">Logout</button>
-            <br>
-            <button id="close-profile-view-btn" class="form-switch-link" style="margin-top: 15px;">Close</button>
-        </div>
-    </div>
-    
-    <div id="add-friend-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Add Friend</h2>
-            <form id="add-friend-form">
-                <input type="text" id="add-friend-id" class="auth-input" placeholder="Enter friend's ting-xxxx ID" required>
-                <br><br>
-                <button type="submit" class="auth-button">Send Request</button>
-                 <p id="add-friend-error" class="error-message"></p>
-            </form>
-            <br>
-            <button id="close-add-friend-btn" class="form-switch-link">Cancel</button>
-        </div>
-    </div>
-    
-    <div id="incoming-call-modal" class="modal">
-        <div class="modal-content">
-            <h2 id="incoming-call-title" class="modal-title">Incoming Call...</h2>
-            <p id="caller-info" style="font-size: 18px; margin-bottom: 20px;"></p>
-            <div style="display: flex; justify-content: space-around;">
-                <button id="accept-call-btn" class="auth-button" style="background-color: #4cd964; width: 100px;">Accept</button>
-                <button id="reject-call-btn" class="auth-button" style="background-color: #ff3b30; width: 100px;">Reject</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Ringtone Audio Element -->
-    <audio id="ringtone" loop>
-        <!-- A simple, short, royalty-free WAV file encoded in Base64 -->
-        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" type="audio/wav">
-    </audio>
+    <div id="profile-setup-modal" class="modal"><div class="modal-content"><h2 class="modal-title">Create Your Profile</h2><form id="profile-setup-form"><input type="text" id="profile-name" class="auth-input" placeholder="Your Name" required><br><br><input type="text" id="profile-emoji" class="auth-input" placeholder="Choose an Emoji (e.g., 😊)" maxlength="2" required><br><br><button type="submit" class="auth-button">Save Profile</button></form></div></div>
+    <div id="profile-view-modal" class="modal"><div class="modal-content"><h2 class="modal-title">My Profile</h2><p style="font-size: 40px; margin: 10px 0;"><span id="view-profile-emoji"></span></p><p><strong>Name:</strong> <span id="view-profile-name"></span></p><p><strong>Ting ID:</strong> <span id="view-profile-ting-id"></span></p><br><button id="blocked-users-btn" class="auth-button" style="background-color: var(--text-muted); margin-bottom: 10px;">Blocked Users</button><button id="theme-toggle-btn" class="auth-button" style="background-color: var(--secondary-color); margin-bottom: 10px;"><svg class="icon"><use xlink:href="#icon-theme"></use></svg>Switch Theme</button><button id="logout-btn" class="auth-button" style="background-color: #555;"><svg class="icon"><use xlink:href="#icon-logout"></use></svg>Logout</button><br><button id="close-profile-view-btn" class="form-switch-link" style="margin-top: 15px;">Close</button></div></div>
+    <div id="add-friend-modal" class="modal"><div class="modal-content"><h2 class="modal-title">Add Friend</h2><form id="add-friend-form"><input type="text" id="add-friend-id" class="auth-input" placeholder="Enter friend's ting-xxxx ID" required><br><br><button type="submit" class="auth-button">Send Request</button><p id="add-friend-error" class="error-message"></p></form><br><button id="close-add-friend-btn" class="form-switch-link">Cancel</button></div></div>
+    <div id="incoming-call-modal" class="modal"><div class="modal-content"><h2 id="incoming-call-title" class="modal-title">Incoming Call...</h2><p id="caller-info" style="font-size: 18px; margin-bottom: 20px;"></p><div style="display: flex; justify-content: space-around;"><button id="accept-call-btn" class="auth-button" style="background-color: var(--success-color); width: 120px;"><svg class="icon"><use xlink:href="#icon-accept"></use></svg>Accept</button><button id="reject-call-btn" class="auth-button" style="background-color: var(--danger-color); width: 120px;"><svg class="icon"><use xlink:href="#icon-reject"></use></svg>Reject</button></div></div></div>
+    <div id="delete-message-modal" class="modal"><div class="modal-content"><h2 class="modal-title">Delete Message?</h2><p>This will delete the message for everyone.</p><br><div style="display: flex; justify-content: space-around;"><button id="confirm-delete-btn" class="auth-button" style="background-color: var(--danger-color); width: 120px;">Delete</button><button id="cancel-delete-btn" class="auth-button" style="background-color: #555; width: 120px;">Cancel</button></div></div></div>
 
-    <!-- Firebase SDKs -->
+    <audio id="ringtone" loop src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // --- START OF JAVASCRIPT ---
-
-        // ***************************************************************
-        // ** IMPORTANT: REPLACE WITH YOUR FIREBASE PROJECT CONFIGURATION **
-        // ***************************************************************
-     const firebaseConfig = {
+    // --- FIREBASE CONFIG & INITIALIZATION ---
+         const firebaseConfig = {
   apiKey: "AIzaSyBUpu3RvGpzR50leWjXJstp0vZwAQ2jxgY",
   authDomain: "bitchat-9b38a.firebaseapp.com",
   databaseURL: "https://bitchat-9b38a-default-rtdb.firebaseio.com",
@@ -496,569 +297,292 @@
   messagingSenderId: "72987828959",
   appId: "1:72987828959:web:70fbeb8dc8fc550cf1bf6a"
 };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const db = firebase.database();
+    // --- GLOBAL STATE & VARIABLES ---
+    let currentUser, userProfile, currentChatPartner, peerConnection, localStream, incomingCallData;
+    let activeCallListener = null, currentMessagesRef = null, typingTimeout = null;
+    let longPressTimer;
+    const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    const mainAppContainer = document.getElementById('main-app-container');
+    const authContainer = document.getElementById('auth-container');
 
-        // Global State
-        let currentUser = null;
-        let userProfile = null;
-        let currentChatPartner = null;
-        let peerConnection;
-        let localStream;
-        let remoteStream;
-        let incomingCallData = null;
-        let activeCallListener = null;
+    // --- UTILITY FUNCTIONS ---
+    function showView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); const view = document.getElementById(viewId); if (view) view.classList.add('active'); }
+    function showModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+    function hideModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+    function applySavedTheme() { if (localStorage.getItem('tingling-theme') === 'light') document.body.classList.add('light-theme'); }
+    applySavedTheme();
 
-        // Peer Connection Config
-        const servers = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
-
-        // DOM Elements
-        const authContainer = document.getElementById('auth-container');
-        const mainAppContainer = document.getElementById('main-app-container');
-        
-        // --- VIEW MANAGEMENT ---
-        function showView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-        }
-
-        function showModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function hideModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-        
-        // --- THEME MANAGEMENT ---
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        themeToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            const theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-            localStorage.setItem('tingling-theme', theme);
-        });
-        
-        function applySavedTheme() {
-            const savedTheme = localStorage.getItem('tingling-theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-theme');
-            }
-        }
-        applySavedTheme();
-
-        // --- AUTHENTICATION ---
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .catch(error => {
-                    document.getElementById('login-error').textContent = error.message;
-                });
-        });
-
-        signupForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .catch(error => {
-                    document.getElementById('signup-error').textContent = error.message;
-                });
-        });
-
-        document.getElementById('switch-to-signup').addEventListener('click', () => {
-            loginForm.style.display = 'none';
-            signupForm.style.display = 'flex';
-        });
-
-        document.getElementById('switch-to-login').addEventListener('click', () => {
-            signupForm.style.display = 'none';
-            loginForm.style.display = 'flex';
-        });
-
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                currentUser = user;
-                const userRef = db.ref(`users/${user.uid}`);
-                const snapshot = await userRef.once('value');
-                if (snapshot.exists()) {
-                    userProfile = snapshot.val();
-                    initializeAppUI();
-                } else {
-                    showModal('profile-setup-modal');
-                }
-            } else {
-                currentUser = null;
-                userProfile = null;
-                authContainer.classList.add('active');
-                mainAppContainer.classList.remove('active');
-                mainAppContainer.style.display = 'none';
-                authContainer.style.display = 'flex';
-                if(activeCallListener) activeCallListener.off();
-            }
-        });
-
-        // --- PROFILE SETUP & MANAGEMENT ---
-        document.getElementById('profile-setup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('profile-name').value;
-            const emoji = document.getElementById('profile-emoji').value;
+    // --- AUTH STATE & PRESENCE ---
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            currentUser = user;
+            const userStatusRef = db.ref(`/status/${user.uid}`);
+            const isOnline = { isOnline: true, last_seen: firebase.database.ServerValue.TIMESTAMP };
+            const isOffline = { isOnline: false, last_seen: firebase.database.ServerValue.TIMESTAMP };
             
-            // Generate unique ting-ID
-            let tingId;
-            let idExists = true;
-            while (idExists) {
-                const randomNum = Math.floor(1000 + Math.random() * 9000);
-                tingId = `ting-${randomNum}`;
-                const idSnapshot = await db.ref('users').orderByChild('tingId').equalTo(tingId).once('value');
-                idExists = idSnapshot.exists();
-            }
+            db.ref('.info/connected').on('value', snapshot => {
+                if(snapshot.val() === false) return;
+                userStatusRef.onDisconnect().set(isOffline).then(() => userStatusRef.set(isOnline));
+            });
 
-            userProfile = { name, emoji, tingId, uid: currentUser.uid };
-            await db.ref(`users/${currentUser.uid}`).set(userProfile);
-            
-            hideModal('profile-setup-modal');
-            initializeAppUI();
-        });
-        
-        function showProfileModal() {
-            document.getElementById('view-profile-name').textContent = userProfile.name;
-            document.getElementById('view-profile-emoji').textContent = userProfile.emoji;
-            document.getElementById('view-profile-ting-id').textContent = userProfile.tingId;
-            showModal('profile-view-modal');
+            const snapshot = await db.ref(`users/${user.uid}`).once('value');
+            if (snapshot.exists()) { userProfile = snapshot.val(); initializeAppUI(); } 
+            else { showModal('profile-setup-modal'); }
+        } else {
+            currentUser = null; userProfile = null;
+            authContainer.style.display = 'flex'; mainAppContainer.style.display = 'none';
+            renderAuthForms();
+            if (activeCallListener) activeCallListener.off(); if (currentMessagesRef) currentMessagesRef.off();
+        }
+    });
+
+    // --- AUTH FORMS & LOGIC ---
+    function renderAuthForms(view = 'email') {
+        const wrapper = document.getElementById('auth-forms-wrapper');
+        let html = '';
+        if(view === 'email') {
+            html = `<form id="login-form" class="auth-form"><input type="email" id="login-email" class="auth-input" placeholder="Email" required><div class="input-wrapper"><input type="password" id="login-password" class="auth-input" placeholder="Password" required><span id="password-toggle"><svg class="icon"><use xlink:href="#icon-eye-slash"></use></svg></span></div><button type="submit" class="auth-button">Log In</button><p id="login-error" class="error-message"></p><p class="form-switch-text">Don't have an account? <span data-auth-view="signup" class="form-switch-link">Sign up</span></p><p class="form-switch-text">Or <span data-auth-view="phone" class="form-switch-link">Login with Phone</span></p></form>`;
+        } else if (view === 'signup') {
+             html = `<form id="signup-form" class="auth-form"><input type="email" id="signup-email" class="auth-input" placeholder="Email" required><div class="input-wrapper"><input type="password" id="signup-password" class="auth-input" placeholder="Password" required><span id="password-toggle"><svg class="icon"><use xlink:href="#icon-eye-slash"></use></svg></span></div><button type="submit" class="auth-button">Sign Up</button><p id="signup-error" class="error-message"></p><p class="form-switch-text">Already have an account? <span data-auth-view="email" class="form-switch-link">Log in</span></p></form>`;
+        } else if (view === 'phone') {
+            html = `<form id="phone-form" class="auth-form"><p>Enter phone number with country code</p><input type="tel" id="phone-number" class="auth-input" placeholder="+919876543210" required><button type="submit" class="auth-button">Send OTP</button><p id="phone-error" class="error-message"></p><p class="form-switch-text">Or <span data-auth-view="email" class="form-switch-link">Login with Email</span></p></form>`;
+        } else if (view === 'otp') {
+            html = `<form id="otp-form" class="auth-form"><p>Enter the OTP sent to your phone.</p><input type="text" id="otp-code" class="auth-input" placeholder="6-digit OTP" required><button type="submit" class="auth-button">Verify OTP</button><p id="otp-error" class="error-message"></p></form>`;
+        }
+        wrapper.innerHTML = html;
+    }
+    renderAuthForms();
+
+    // --- EVENT LISTENERS ---
+    document.body.addEventListener('click', e => {
+        const target = e.target;
+        const authLink = target.closest('[data-auth-view]');
+        if(authLink) { renderAuthForms(authLink.dataset.authView); return; }
+
+        const passwordToggle = target.closest('#password-toggle');
+        if(passwordToggle) {
+            const passInput = passwordToggle.previousElementSibling;
+            const isPassword = passInput.type === 'password';
+            passInput.type = isPassword ? 'text' : 'password';
+            passwordToggle.querySelector('use').setAttribute('xlink:href', isPassword ? '#icon-eye' : '#icon-eye-slash');
+            return;
         }
         
-        document.getElementById('close-profile-view-btn').addEventListener('click', () => hideModal('profile-view-modal'));
-        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+        const profileBtn = target.closest('#profile-btn');
+        const addFriendBtn = target.closest('#add-friend-btn');
+        const homeBtn = target.closest('#home-btn');
+        const notificationsBtn = target.closest('#notifications-btn');
+        const callsBtn = target.closest('#calls-btn');
+        const contactAction = target.closest('.list-item-actions .icon-button');
+        const backBtn = target.closest('#back-to-home-btn');
+        const acceptReqBtn = target.closest('.accept-request-btn');
+        const blockedUsersBtn = target.closest('#blocked-users-btn');
+        const unblockBtn = target.closest('.unblock-btn');
+        const moreMenuBtn = target.closest('#more-menu-btn');
+        const blockUserBtn = target.closest('#block-user-btn');
+        const themeToggleBtn = target.closest('#theme-toggle-btn');
+        const logoutBtn = target.closest('#logout-btn');
+        const closeProfileBtn = target.closest('#close-profile-view-btn');
+        const closeAddFriendBtn = target.closest('#close-add-friend-btn');
+        const acceptCallBtn = target.closest('#accept-call-btn');
+        const rejectCallBtn = target.closest('#reject-call-btn');
+        const endCallBtn = target.closest('#end-call-btn');
 
-
-        // --- MAIN APP UI & NAVIGATION ---
-        function initializeAppUI() {
-            authContainer.style.display = 'none';
-            authContainer.classList.remove('active');
-            mainAppContainer.style.display = 'flex';
-            mainAppContainer.classList.add('active');
-
-            mainAppContainer.innerHTML = `
-                <div id="app-content-view" class="view active">
-                    <div class="top-nav">
-                        <button id="profile-btn" class="nav-button">Profile</button>
-                        <h2 class="app-title-small">Tingling</h2>
-                        <button id="add-friend-btn" class="nav-button">Add Friend</button>
-                    </div>
-                    <div id="content-area" class="content-area">
-                        <!-- Content like contacts, notifications will be loaded here -->
-                    </div>
-                    <div class="bottom-nav">
-                        <button id="home-btn" class="nav-button bottom-nav-button">Home <span id="home-badge" class="badge"></span></button>
-                        <button id="notifications-btn" class="nav-button bottom-nav-button">Notifications <span id="notifications-badge" class="badge"></span></button>
-                        <button id="calls-btn" class="nav-button bottom-nav-button">Calls</button>
-                    </div>
-                </div>
-                <div id="chat-view" class="view"></div>
-                <div id="call-view" class="view"></div>
-            `;
-            
-            // Add event listeners for new UI
-            document.getElementById('profile-btn').addEventListener('click', showProfileModal);
-            document.getElementById('add-friend-btn').addEventListener('click', () => showModal('add-friend-modal'));
-            
-            document.getElementById('home-btn').addEventListener('click', showContacts);
-            document.getElementById('notifications-btn').addEventListener('click', showNotifications);
-            document.getElementById('calls-btn').addEventListener('click', showCallLogs);
-            
-            // Initial view
-            showContacts();
-            listenForNotifications();
-            listenForIncomingCalls();
+        if (profileBtn) showProfileModal();
+        else if (addFriendBtn) showModal('add-friend-modal');
+        else if (homeBtn) showContacts();
+        else if (notificationsBtn) showNotifications();
+        else if (callsBtn) showCallLogs();
+        else if (backBtn) closeChatView();
+        else if (acceptReqBtn) acceptRequest(acceptReqBtn.dataset.uid);
+        else if (blockedUsersBtn) showBlockedUsers();
+        else if (unblockBtn) unblockUser(unblockBtn.dataset.uid);
+        else if (moreMenuBtn) toggleMoreMenu();
+        else if (blockUserBtn) blockCurrentUser();
+        else if (themeToggleBtn) { document.body.classList.toggle('light-theme'); localStorage.setItem('tingling-theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); }
+        else if (logoutBtn) auth.signOut();
+        else if (closeProfileBtn) hideModal('profile-view-modal');
+        else if (closeAddFriendBtn) hideModal('add-friend-modal');
+        else if (acceptCallBtn) acceptCall();
+        else if (rejectCallBtn) rejectCall();
+        else if (endCallBtn) endCall();
+        else if (contactAction) {
+            const uid = contactAction.parentElement.dataset.uid;
+            const type = contactAction.dataset.type;
+            if(type === 'message') openChat(uid); 
+            else if(type === 'voice') startCall(uid, false); 
+            else if(type === 'video') startCall(uid, true);
         }
+    });
 
-        // --- FRIEND SYSTEM ---
-        document.getElementById('add-friend-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const friendId = document.getElementById('add-friend-id').value;
-            const errorP = document.getElementById('add-friend-error');
-            errorP.textContent = '';
-            
-            if (friendId === userProfile.tingId) {
-                errorP.textContent = "You can't add yourself.";
-                return;
-            }
+    document.getElementById('auth-forms-wrapper').addEventListener('submit', e => {
+        e.preventDefault();
+        if(e.target.id === 'login-form') { auth.signInWithEmailAndPassword(e.target.elements['login-email'].value, e.target.elements['login-password'].value).catch(err => document.getElementById('login-error').textContent = err.message); }
+        else if(e.target.id === 'signup-form') { auth.createUserWithEmailAndPassword(e.target.elements['signup-email'].value, e.target.elements['signup-password'].value).catch(err => document.getElementById('signup-error').textContent = err.message); }
+        else if(e.target.id === 'phone-form') { sendOtp(e.target.elements['phone-number'].value); }
+        else if(e.target.id === 'otp-form') { verifyOtp(e.target.elements['otp-code'].value); }
+    });
+    
+    // --- APP INITIALIZATION ---
+    function initializeAppUI() {
+        authContainer.style.display = 'none'; mainAppContainer.style.display = 'flex';
+        mainAppContainer.innerHTML = `<div id="app-content-view" class="view active"><div class="top-nav" id="main-top-nav"></div><div id="content-area" class="content-area"></div><div class="bottom-nav" id="main-bottom-nav"></div></div><div id="chat-view" class="view"></div><div id="call-view" class="view"></div>`;
+        showContacts(); listenForNotifications(); listenForIncomingCalls();
+    }
+    
+    // --- PROFILE, FRIEND & BLOCK ---
+    document.getElementById('profile-setup-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        let tingId, idExists = true;
+        while(idExists) { tingId = `ting-${Math.floor(1000 + Math.random() * 9000)}`; idExists = (await db.ref('users').orderByChild('tingId').equalTo(tingId).once('value')).exists(); }
+        userProfile = { name: e.target.elements['profile-name'].value, emoji: e.target.elements['profile-emoji'].value, tingId, uid: currentUser.uid };
+        await db.ref(`users/${currentUser.uid}`).set(userProfile);
+        hideModal('profile-setup-modal'); initializeAppUI();
+    });
 
-            const usersRef = db.ref('users');
-            const snapshot = await usersRef.orderByChild('tingId').equalTo(friendId).once('value');
-
-            if (snapshot.exists()) {
-                const friendData = Object.values(snapshot.val())[0];
-                await db.ref(`requests/${friendData.uid}/${currentUser.uid}`).set(userProfile);
-                alert('Friend request sent!');
-                hideModal('add-friend-modal');
-            } else {
-                errorP.textContent = 'User not found.';
-            }
+    function showProfileModal() { document.getElementById('view-profile-emoji').textContent = userProfile.emoji; document.getElementById('view-profile-name').textContent = userProfile.name; document.getElementById('view-profile-ting-id').textContent = userProfile.tingId; showModal('profile-view-modal'); }
+    document.getElementById('add-friend-form').addEventListener('submit', async e => { e.preventDefault(); const friendId = document.getElementById('add-friend-id').value; if (friendId === userProfile.tingId) { document.getElementById('add-friend-error').textContent = "You can't add yourself."; return; } const snapshot = await db.ref('users').orderByChild('tingId').equalTo(friendId).once('value'); if (snapshot.exists()) { const friendData = Object.values(snapshot.val())[0]; await db.ref(`requests/${friendData.uid}/${currentUser.uid}`).set(userProfile); alert('Friend request sent!'); hideModal('add-friend-modal'); } else { document.getElementById('add-friend-error').textContent = 'User not found.'; } });
+    function blockCurrentUser() { if(confirm(`Block ${currentChatPartner.name}?`)){ db.ref(`blocked/${currentUser.uid}/${currentChatPartner.uid}`).set(true); alert(`${currentChatPartner.name} has been blocked.`); closeChatView(); } }
+    async function showBlockedUsers() {
+        hideModal('profile-view-modal'); showView('app-content-view'); renderMainUI();
+        const contentArea = document.getElementById('content-area'); contentArea.innerHTML = `<h3>Blocked Users</h3><div id="blocked-list"></div>`;
+        const snapshot = await db.ref(`blocked/${currentUser.uid}`).once('value');
+        const list = document.getElementById('blocked-list'); list.innerHTML = '';
+        if (!snapshot.exists()) { list.innerHTML = '<p style="padding: 15px;">No blocked users.</p>'; return; }
+        snapshot.forEach(child => {
+            db.ref(`users/${child.key}`).once('value', userSnap => {
+                const blockedUser = userSnap.val();
+                if(blockedUser) { const el = document.createElement('div'); el.className = 'list-item'; el.innerHTML = `<div class="list-item-emoji">${blockedUser.emoji}</div><div class="list-item-info"><div class="list-item-name">${blockedUser.name}</div></div><div class="list-item-actions"><button class="auth-button unblock-btn" data-uid="${blockedUser.uid}" style="background-color:var(--success-color);width:auto;padding:5px 15px;">Unblock</button></div>`; list.appendChild(el); }
+            });
         });
-        document.getElementById('close-add-friend-btn').addEventListener('click', () => hideModal('add-friend-modal'));
-        
-        async function showContacts() {
-            const contentArea = document.getElementById('content-area');
-            contentArea.innerHTML = '<h3>Contacts</h3>';
-            const contactsRef = db.ref(`contacts/${currentUser.uid}`);
-            contactsRef.on('value', async snapshot => {
-                if (!snapshot.exists()) {
-                    contentArea.innerHTML += '<p>No contacts yet. Add friends!</p>';
-                    return;
-                }
-                const contacts = snapshot.val();
-                for (const friendUid in contacts) {
-                    const friendProfile = (await db.ref(`users/${friendUid}`).once('value')).val();
-                    if(friendProfile){
-                        const contactEl = document.createElement('div');
-                        contactEl.className = 'list-item';
-                        contactEl.innerHTML = `
-                            <div class="list-item-emoji">${friendProfile.emoji}</div>
-                            <div class="list-item-info">
-                                <div class="list-item-name">${friendProfile.name}</div>
-                            </div>
-                            <div class="list-item-actions">
-                                <button class="nav-button" data-uid="${friendUid}" data-type="message">Message</button>
-                                <button class="nav-button" data-uid="${friendUid}" data-type="video">Video Call</button>
-                            </div>
-                        `;
-                        contentArea.appendChild(contactEl);
+    }
+    function unblockUser(uid) { db.ref(`blocked/${currentUser.uid}/${uid}`).remove().then(() => { alert("User unblocked."); showBlockedUsers(); }); }
+    
+    // --- MAIN VIEWS ---
+    function renderMainUI() {
+        const topNav = document.getElementById('main-top-nav'); const bottomNav = document.getElementById('main-bottom-nav');
+        if (topNav) topNav.innerHTML = `<button id="profile-btn" class="nav-button"><svg class="icon"><use xlink:href="#icon-profile"></use></svg></button><h2 class="app-title-small">Tingling</h2><button id="add-friend-btn" class="nav-button"><svg class="icon"><use xlink:href="#icon-add-friend"></use></svg></button>`;
+        if (bottomNav) bottomNav.innerHTML = `<button id="home-btn" class="nav-button bottom-nav-button"><svg class="icon"><use xlink:href="#icon-home"></use></svg>Home</button><button id="notifications-btn" class="nav-button bottom-nav-button"><svg class="icon"><use xlink:href="#icon-notifications"></use></svg>Notifications<span id="notifications-badge" class="badge"></span></button><button id="calls-btn" class="nav-button bottom-nav-button"><svg class="icon"><use xlink:href="#icon-calls"></use></svg>Calls</button>`;
+    }
+
+    function showContacts() {
+        showView('app-content-view'); renderMainUI();
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = '<h3>Contacts</h3><div id="contacts-list"></div>';
+        db.ref(`contacts/${currentUser.uid}`).on('value', snapshot => {
+            const list = document.getElementById('contacts-list'); if(!list) return; list.innerHTML = '';
+            if (!snapshot.exists()) { list.innerHTML = '<p style="padding: 15px;">No contacts yet.</p>'; return; }
+            snapshot.forEach(child => {
+                db.ref(`users/${child.key}`).once('value', userSnap => {
+                    const friend = userSnap.val();
+                    if(friend) {
+                        const el = document.createElement('div'); el.className = 'list-item';
+                        el.innerHTML = `<div class="list-item-emoji">${friend.emoji}</div><div class="list-item-info"><div class="list-item-name">${friend.name}</div><div class="list-item-detail" id="status-${friend.uid}"></div></div><div class="list-item-actions" data-uid="${friend.uid}"><button class="icon-button" data-type="message"><svg class="icon"><use xlink:href="#icon-message"></use></svg></button><button class="icon-button" data-type="voice"><svg class="icon"><use xlink:href="#icon-voice-call"></use></svg></button><button class="icon-button" data-type="video"><svg class="icon"><use xlink:href="#icon-video-call"></use></svg></button></div>`;
+                        list.appendChild(el);
+                        updateUserStatusUI(friend.uid);
                     }
-                }
-            });
-        }
-
-        document.getElementById('main-app-container').addEventListener('click', (e) => {
-            if (e.target.dataset.uid && e.target.dataset.type === 'message') {
-                openChat(e.target.dataset.uid);
-            }
-            if (e.target.dataset.uid && e.target.dataset.type === 'video') {
-                startCall(e.target.dataset.uid, true);
-            }
-        });
-        
-        async function showNotifications() {
-             const contentArea = document.getElementById('content-area');
-             contentArea.innerHTML = '<h3>Notifications</h3>';
-             const requestsRef = db.ref(`requests/${currentUser.uid}`);
-             requestsRef.on('value', snapshot => {
-                if(!snapshot.exists()){
-                    contentArea.innerHTML += '<p>No new notifications.</p>';
-                    return;
-                }
-                snapshot.forEach(childSnapshot => {
-                    const requestData = childSnapshot.val();
-                    const requestEl = document.createElement('div');
-                    requestEl.className = 'list-item';
-                    requestEl.innerHTML = `
-                         <div class="list-item-emoji">${requestData.emoji}</div>
-                         <div class="list-item-info">
-                            <div class="list-item-name">${requestData.name}</div>
-                            <div class="list-item-detail">Wants to be your friend.</div>
-                        </div>
-                        <div class="list-item-actions">
-                            <button class="nav-button" onclick="acceptRequest('${requestData.uid}')">Accept</button>
-                            <button class="nav-button" onclick="rejectRequest('${requestData.uid}')">Reject</button>
-                        </div>
-                    `;
-                    contentArea.appendChild(requestEl);
                 });
-             });
-        }
-        
-        async function acceptRequest(friendUid) {
-            const friendProfile = (await db.ref(`users/${friendUid}`).once('value')).val();
-            await db.ref(`contacts/${currentUser.uid}/${friendUid}`).set(true);
-            await db.ref(`contacts/${friendUid}/${currentUser.uid}`).set(true);
-            await db.ref(`requests/${currentUser.uid}/${friendUid}`).remove();
-            alert(`You are now friends with ${friendProfile.name}`);
-            showNotifications();
-        }
-        
-        async function rejectRequest(friendUid) {
-            await db.ref(`requests/${currentUser.uid}/${friendUid}`).remove();
-            alert('Request rejected.');
-            showNotifications();
-        }
-        
-        function listenForNotifications() {
-            const requestsRef = db.ref(`requests/${currentUser.uid}`);
-            requestsRef.on('value', snapshot => {
-                const badge = document.getElementById('notifications-badge');
-                if (snapshot.exists() && snapshot.numChildren() > 0) {
-                    badge.textContent = snapshot.numChildren();
-                    badge.style.display = 'block';
-                } else {
-                    badge.style.display = 'none';
-                }
             });
-        }
-
-        // --- REAL-TIME CHAT ---
-        async function openChat(friendUid) {
-            const friendProfile = (await db.ref(`users/${friendUid}`).once('value')).val();
-            currentChatPartner = friendProfile;
-            
-            const chatView = document.getElementById('chat-view');
-            chatView.innerHTML = `
-                <div class="chat-header">
-                    <button id="back-to-home" class="nav-button">&lt; Back</button>
-                    <div class="user-emoji">${friendProfile.emoji}</div>
-                    <div class="user-name">${friendProfile.name}</div>
-                </div>
-                <div class="chat-messages" id="chat-messages-container"></div>
-                <div class="chat-input-area">
-                    <input type="text" id="message-input" placeholder="Type a message...">
-                    <button id="send-message-btn">Send</button>
-                </div>
-            `;
-            
-            document.getElementById('back-to-home').addEventListener('click', () => {
-                showView('app-content-view');
-                currentChatPartner = null;
-            });
-            
-            const sendMessageBtn = document.getElementById('send-message-btn');
-            const messageInput = document.getElementById('message-input');
-            
-            sendMessageBtn.addEventListener('click', sendMessage);
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-
-            showView('chat-view');
-            listenForMessages();
-        }
-
-        function getChatId() {
-            return [currentUser.uid, currentChatPartner.uid].sort().join('_');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('message-input');
-            const text = messageInput.value.trim();
-            if (text === '') return;
-            
-            const chatId = getChatId();
-            const messageData = {
-                text: text,
-                sender: currentUser.uid,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            db.ref(`messages/${chatId}`).push(messageData);
-            messageInput.value = '';
-        }
-
-        function listenForMessages() {
-            const chatId = getChatId();
-            const messagesContainer = document.getElementById('chat-messages-container');
-            const messagesRef = db.ref(`messages/${chatId}`).limitToLast(50);
-            
-            messagesRef.on('child_added', snapshot => {
-                const message = snapshot.val();
-                const bubble = document.createElement('div');
-                bubble.className = 'message-bubble';
-                bubble.textContent = message.text;
-                
-                if (message.sender === currentUser.uid) {
-                    bubble.classList.add('sent');
-                } else {
-                    bubble.classList.add('received');
-                }
-                
-                messagesContainer.appendChild(bubble);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            });
-        }
-
-        // --- WEBRTC CALLING ---
-        const ringtone = document.getElementById('ringtone');
-
-        async function startCall(friendUid, isVideo) {
-            const friendProfile = (await db.ref(`users/${friendUid}`).once('value')).val();
-            currentChatPartner = friendProfile;
-
-            peerConnection = new RTCPeerConnection(servers);
-
-            localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            const callData = {
-                callerId: currentUser.uid,
-                callerProfile: userProfile,
-                calleeId: friendUid,
-                isVideo: isVideo,
-                status: 'ringing'
-            };
-            const callRef = db.ref(`calls/${friendUid}`);
-            await callRef.set(callData);
-
-            // Listen for answer
-            callRef.on('value', async snapshot => {
-                const data = snapshot.val();
-                if(data && data.answer) {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                }
-            });
-            
-            // Listen for ICE candidates from callee
-            db.ref(`iceCandidates/${friendUid}`).on('child_added', snapshot => {
-                if (snapshot.exists()) {
-                    peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-                    db.ref(`iceCandidates/${friendUid}/${snapshot.key}`).remove();
-                }
-            });
-
-            peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                    db.ref(`iceCandidates/${currentUser.uid}`).push(event.candidate.toJSON());
-                }
-            };
-            
-            peerConnection.ontrack = event => {
-                remoteStream = event.streams[0];
-                document.getElementById('remote-video').srcObject = remoteStream;
-            };
-
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            
-            await callRef.update({ offer: offer });
-            
-            showCallUI(isVideo);
-        }
-
-        function listenForIncomingCalls() {
-            activeCallListener = db.ref(`calls/${currentUser.uid}`);
-            activeCallListener.on('value', snapshot => {
-                if (snapshot.exists()) {
-                    incomingCallData = snapshot.val();
-                    const { callerProfile, isVideo } = incomingCallData;
-                    document.getElementById('caller-info').textContent = `${callerProfile.emoji} ${callerProfile.name} is calling...`;
-                    document.getElementById('incoming-call-title').textContent = isVideo ? 'Incoming Video Call' : 'Incoming Voice Call';
-                    showModal('incoming-call-modal');
-                    ringtone.play();
-                }
-            });
-        }
-
-        document.getElementById('accept-call-btn').addEventListener('click', async () => {
-            ringtone.pause();
-            hideModal('incoming-call-modal');
-
-            const { callerId, isVideo, offer } = incomingCallData;
-            currentChatPartner = (await db.ref(`users/${callerId}`).once('value')).val();
-
-            peerConnection = new RTCPeerConnection(servers);
-            localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-            peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                    db.ref(`iceCandidates/${callerId}`).push(event.candidate.toJSON());
-                }
-            };
-
-            peerConnection.ontrack = event => {
-                remoteStream = event.streams[0];
-                document.getElementById('remote-video').srcObject = remoteStream;
-            };
-
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-
-            await db.ref(`calls/${currentUser.uid}`).update({ answer });
-            
-            // Listen for ICE from caller
-            db.ref(`iceCandidates/${currentUser.uid}`).on('child_added', snapshot => {
-                if (snapshot.exists()) {
-                    peerConnection.addIceCandidate(new RTCIceCandidate(snapshot.val()));
-                     db.ref(`iceCandidates/${currentUser.uid}/${snapshot.key}`).remove();
-                }
-            });
-
-            showCallUI(isVideo);
         });
+    }
 
-        document.getElementById('reject-call-btn').addEventListener('click', async () => {
-            ringtone.pause();
-            hideModal('incoming-call-modal');
-            const { callerId } = incomingCallData;
-            await db.ref(`calls/${currentUser.uid}`).remove();
-            // Optional: send a 'rejected' signal
-        });
+    // --- CHAT & PRESENCE ---
+    async function openChat(friendUid) {
+        const amIBlocked = (await db.ref(`blocked/${friendUid}/${currentUser.uid}`).once('value')).exists();
+        if(amIBlocked) { alert("You can't interact with this user."); return; }
+        const friendProfile = (await db.ref(`users/${friendUid}`).once('value')).val();
+        currentChatPartner = friendProfile;
+        const chatView = document.getElementById('chat-view');
+        chatView.innerHTML = `<div class="chat-header"><button class="nav-button" id="back-to-home-btn"><svg class="icon"><use xlink:href="#icon-back"></use></svg></button><div class="user-emoji">${friendProfile.emoji}</div><div class="user-name-wrapper"><div class="user-name">${friendProfile.name}</div><div id="typing-indicator"></div></div><div id="more-menu-btn" class="nav-button"><svg class="icon"><use xlink:href="#icon-more"></use></svg><div id="more-menu-dropdown"><button id="block-user-btn" class="nav-button"><svg class="icon" style="fill:var(--danger-color);"><use xlink:href="#icon-block"></use></svg>Block User</button></div></div></div><div class="chat-messages" id="chat-messages-container"></div><form class="chat-input-area" id="message-form"><input type="text" id="message-input" placeholder="Type a message..." autocomplete="off"><button type="submit" id="send-message-btn"><svg class="icon" style="fill:white;"><use xlink:href="#icon-send"></use></svg></button></form>`;
+        chatView.querySelector('#message-form').addEventListener('submit', e => { e.preventDefault(); sendMessage(); });
+        chatView.querySelector('#message-input').oninput = handleTyping;
+        showView('chat-view');
+        listenForMessages(); listenForTyping();
+        markMessagesAsRead();
+    }
+    
+    function closeChatView() { if (currentMessagesRef) { currentMessagesRef.off(); currentMessagesRef = null; } db.ref(`typing/${getChatId()}/${currentUser.uid}`).remove(); showContacts(); currentChatPartner = null; }
+    function getChatId() { if(!currentUser || !currentChatPartner) return null; return currentUser.uid < currentChatPartner.uid ? `${currentUser.uid}_${currentChatPartner.uid}` : `${currentChatPartner.uid}_${currentUser.uid}`; }
+    function sendMessage() { const input = document.getElementById('message-input'); if (input.value.trim() === '') return; db.ref(`messages/${getChatId()}`).push({ text: input.value, sender: currentUser.uid, timestamp: firebase.database.ServerValue.TIMESTAMP, status: 'sent' }); input.value = ''; handleTyping(true); }
 
-        function showCallUI(isVideo) {
-            const callView = document.getElementById('call-view');
-            callView.innerHTML = `
-                <video id="remote-video" autoplay playsinline></video>
-                <video id="local-video" autoplay playsinline muted></video>
-                <div class="call-info">
-                    <div class="call-info-emoji">${currentChatPartner.emoji}</div>
-                    <div class="call-info-name">${currentChatPartner.name}</div>
-                </div>
-                <div class="call-controls">
-                    <button id="end-call-btn">End</button>
-                </div>
-            `;
-            
-            document.getElementById('local-video').srcObject = localStream;
-            if(!isVideo){
-                document.getElementById('remote-video').style.display = 'none';
-                document.getElementById('local-video').style.display = 'none';
-            }
-            
-            document.getElementById('end-call-btn').addEventListener('click', endCall);
-
-            showView('call-view');
-        }
-
-        async function endCall() {
-            if (peerConnection) {
-                peerConnection.close();
-            }
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-
-            await db.ref(`calls/${currentUser.uid}`).remove();
-            await db.ref(`calls/${currentChatPartner.uid}`).remove();
-            await db.ref(`iceCandidates/${currentUser.uid}`).remove();
-            await db.ref(`iceCandidates/${currentChatPartner.uid}`).remove();
-
-            peerConnection = null;
-            localStream = null;
-            remoteStream = null;
-
-            showView('app-content-view');
-            showContacts();
+    function listenForMessages() {
+        const container = document.getElementById('chat-messages-container'); if(!container) return; container.innerHTML = '';
+        currentMessagesRef = db.ref(`messages/${getChatId()}`).limitToLast(100);
+        currentMessagesRef.on('child_added', snapshot => { renderMessage(snapshot); });
+        currentMessagesRef.on('child_changed', snapshot => { renderMessage(snapshot, true); });
+        currentMessagesRef.on('child_removed', snapshot => { const msgEl = document.querySelector(`[data-msg-id="${snapshot.key}"]`); if(msgEl) msgEl.remove(); });
+    }
+    
+    function renderMessage(snapshot, isUpdate = false) {
+        const container = document.getElementById('chat-messages-container'); if(!container) return;
+        const msg = snapshot.val(); const msgId = snapshot.key;
+        let wrapper = document.querySelector(`[data-msg-id='${msgId}']`);
+        if (!wrapper) { wrapper = document.createElement('div'); wrapper.dataset.msgId = msgId; wrapper.className = 'message-wrapper'; container.appendChild(wrapper); }
+        wrapper.innerHTML = `<div class="message-bubble">${msg.text}</div>`;
+        const bubble = wrapper.firstChild;
+        bubble.classList.add(msg.sender === currentUser.uid ? 'sent' : 'received');
+        
+        if (msg.sender === currentUser.uid) {
+            const meta = document.createElement('div'); meta.className = 'message-meta';
+            const tickIcon = msg.status === 'read' ? 'icon-tick-double' : 'icon-tick-single';
+            const tickClass = msg.status === 'read' ? 'read' : 'sent';
+            meta.innerHTML = `<svg class="message-ticks ${tickClass}"><use xlink:href="#${tickIcon}"></use></svg>`;
+            wrapper.appendChild(meta);
         }
         
-        // Placeholder for Call Logs
-        function showCallLogs() {
-             const contentArea = document.getElementById('content-area');
-             contentArea.innerHTML = '<h3>Call Logs</h3><p>Call log functionality is not fully implemented in this version.</p>';
-        }
+        bubble.addEventListener('mousedown', () => { longPressTimer = setTimeout(() => { confirmDeleteMessage(msgId); }, 800); });
+        bubble.addEventListener('mouseup', () => { clearTimeout(longPressTimer); });
+        bubble.addEventListener('mouseleave', () => { clearTimeout(longPressTimer); });
+        if(!isUpdate) container.scrollTop = container.scrollHeight;
+    }
+    
+    function confirmDeleteMessage(messageId) {
+        showModal('delete-message-modal');
+        document.getElementById('confirm-delete-btn').onclick = () => { db.ref(`messages/${getChatId()}/${messageId}`).remove(); hideModal('delete-message-modal'); };
+        document.getElementById('cancel-delete-btn').onclick = () => hideModal('delete-message-modal');
+    }
+    
+    function markMessagesAsRead() {
+        const messagesRef = db.ref(`messages/${getChatId()}`);
+        messagesRef.orderByChild('sender').equalTo(currentChatPartner.uid).once('value', snapshot => {
+            snapshot.forEach(child => { if(child.val().status !== 'read') child.ref.update({status: 'read'}); });
+        });
+    }
 
-        // --- END OF JAVASCRIPT ---
+    function toggleMoreMenu() { const menu = document.getElementById('more-menu-dropdown'); menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; }
+    function formatTimestamp(ts) { const d = new Date(ts); return `last seen: ${d.toLocaleTimeString()}`; }
+    function updateUserStatusUI(uid) {
+        const statusEl = document.getElementById(`status-${uid}`); if (!statusEl) return;
+        db.ref(`/status/${uid}`).on('value', snapshot => {
+            if (snapshot.exists()) { const s = snapshot.val(); if (s.isOnline) { statusEl.textContent = 'Online'; statusEl.classList.add('online'); } else { statusEl.textContent = formatTimestamp(s.last_seen); statusEl.classList.remove('online'); } } 
+            else { statusEl.textContent = 'Offline'; statusEl.classList.remove('online');}
+        });
+    }
+    function handleTyping(stopped = false) { clearTimeout(typingTimeout); const typingRef = db.ref(`typing/${getChatId()}/${currentUser.uid}`); if(stopped) { typingRef.remove(); return; } typingRef.set(true); typingTimeout = setTimeout(() => typingRef.remove(), 2000); }
+    function listenForTyping() { const indicator = document.getElementById('typing-indicator'); db.ref(`typing/${getChatId()}/${currentChatPartner.uid}`).on('value', snapshot => { if (indicator) indicator.textContent = snapshot.exists() ? 'typing...' : ''; }); }
+
+    // --- CALLING ---
+    const ringtone = document.getElementById('ringtone');
+    async function startCall(friendUid, isVideo) { 
+        const isBlockedByMe = (await db.ref(`blocked/${currentUser.uid}/${friendUid}`).once('value')).exists(); if(isBlockedByMe) { alert("You have blocked this user."); return; }
+        const amIBlocked = (await db.ref(`blocked/${friendUid}/${currentUser.uid}`).once('value')).exists(); if(amIBlocked) { alert("You can't call this user."); return; }
+        try { const friend = (await db.ref(`users/${friendUid}`).once('value')).val(); currentChatPartner = friend; localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true }); peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream)); const callRef = db.ref(`calls/${friendUid}`); const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); await callRef.set({ callerId: currentUser.uid, callerProfile: userProfile, isVideo, offer }); peerConnection.onicecandidate = e => e.candidate && db.ref(`iceCandidates/${friendUid}/${currentUser.uid}`).push(e.candidate.toJSON()); peerConnection.ontrack = e => { document.getElementById('remote-video').srcObject = e.streams[0]; }; callRef.on('value', async snapshot => { const data = snapshot.val(); if (data && data.answer && !peerConnection.currentRemoteDescription) await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer)); }); db.ref(`iceCandidates/${currentUser.uid}/${friendUid}`).on('child_added', s => { if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(s.val())); s.ref.remove(); }); showCallUI(isVideo); } catch (error) { console.error("Call start error:", error); alert("Could not start call."); } 
+    }
+    function listenForIncomingCalls() { activeCallListener = db.ref(`calls/${currentUser.uid}`); activeCallListener.on('value', s => { if (s.exists()) { incomingCallData = s.val(); if (incomingCallData.callerId && currentUser) { db.ref(`blocked/${currentUser.uid}/${incomingCallData.callerId}`).once('value', blockSnap => { if (!blockSnap.exists()) { document.getElementById('caller-info').innerHTML = `${incomingCallData.callerProfile.emoji} <strong>${incomingCallData.callerProfile.name}</strong>`; document.getElementById('incoming-call-title').textContent = incomingCallData.isVideo ? 'Incoming Video Call' : 'Incoming Voice Call'; showModal('incoming-call-modal'); ringtone.play(); } else { db.ref(`calls/${currentUser.uid}`).remove(); } }); } } }); }
+    async function acceptCall() { ringtone.pause(); hideModal('incoming-call-modal'); const { callerId, isVideo, offer } = incomingCallData; currentChatPartner = (await db.ref(`users/${callerId}`).once('value')).val(); localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true }); peerConnection = new RTCPeerConnection(servers); localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream)); peerConnection.onicecandidate = e => e.candidate && db.ref(`iceCandidates/${callerId}/${currentUser.uid}`).push(e.candidate.toJSON()); peerConnection.ontrack = e => { document.getElementById('remote-video').srcObject = e.streams[0]; }; await peerConnection.setRemoteDescription(new RTCSessionDescription(offer)); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer); await db.ref(`calls/${currentUser.uid}`).update({ answer }); db.ref(`iceCandidates/${currentUser.uid}/${callerId}`).on('child_added', s => { if(peerConnection) peerConnection.addIceCandidate(new RTCIceCandidate(s.val())); s.ref.remove(); }); showCallUI(isVideo); };
+    function rejectCall() { ringtone.pause(); hideModal('incoming-call-modal'); db.ref(`calls/${currentUser.uid}`).remove(); };
+    function showCallUI(isVideo) { document.getElementById('call-view').innerHTML = `<video id="remote-video" autoplay playsinline></video><div id="voice-call-ui"><div class="caller-emoji-large">${currentChatPartner.emoji}</div><div class="caller-name-large">${currentChatPartner.name}</div><div class="call-status">Connecting...</div></div><video id="local-video" autoplay playsinline muted></video><div class="call-controls"><button id="end-call-btn"><svg class="icon" style="fill:white;"><use xlink:href="#icon-end-call"></use></svg></button></div>`; document.getElementById('local-video').srcObject = localStream; document.getElementById('voice-call-ui').style.display = isVideo ? 'none' : 'flex'; document.getElementById('local-video').style.display = isVideo ? 'block' : 'none'; document.getElementById('remote-video').style.display = isVideo ? 'block' : 'none'; showView('call-view'); }
+    function endCall() { if (localStream) localStream.getTracks().forEach(t => t.stop()); if (peerConnection) { peerConnection.close(); peerConnection = null; } db.ref(`calls/${currentUser.uid}`).remove(); if(currentChatPartner) db.ref(`calls/${currentChatPartner.uid}`).remove(); showContacts(); }
+    
+    // --- OTHER VIEWS ---
+    function showNotifications() { showView('app-content-view'); renderMainUI(); const area = document.getElementById('content-area'); area.innerHTML = '<h3>Notifications</h3><div id="notifications-list"></div>'; db.ref(`requests/${currentUser.uid}`).on('value', s => { const list = document.getElementById('notifications-list'); list.innerHTML = ''; if (!s.exists()) { list.innerHTML = '<p style="padding: 15px;">No new notifications.</p>'; return; } s.forEach(cs => { const req = cs.val(); const el = document.createElement('div'); el.className = 'list-item'; el.innerHTML = `<div class="list-item-emoji">${req.emoji}</div><div class="list-item-info"><div class="list-item-name">${req.name}</div><div class="list-item-detail">Sent a friend request.</div></div><div class="list-item-actions"><button class="auth-button accept-request-btn" data-uid="${req.uid}" style="background-color:var(--success-color);width:auto;padding:5px 15px;">Accept</button></div>`; list.appendChild(el); }); }); }
+    async function acceptRequest(friendUid) { await db.ref(`contacts/${currentUser.uid}/${friendUid}`).set(true); await db.ref(`contacts/${friendUid}/${currentUser.uid}`).set(true); await db.ref(`requests/${currentUser.uid}/${friendUid}`).remove(); alert('Friend request accepted!'); showNotifications(); }
+    function listenForNotifications() { db.ref(`requests/${currentUser.uid}`).on('value', snapshot => { const badge = document.getElementById('notifications-badge'); if(badge) { badge.style.display = snapshot.exists() ? 'block' : 'none'; if (snapshot.exists()) badge.textContent = snapshot.numChildren(); } }); }
+    function showCallLogs() { showView('app-content-view'); renderMainUI(); document.getElementById('content-area').innerHTML = '<h3>Call Logs</h3><p style="padding:15px;">Call log feature is not implemented.</p>'; }
     </script>
 </body>
 </html>
